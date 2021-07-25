@@ -9,7 +9,7 @@ from django.core.management.base import BaseCommand, CommandError
 
 import tqdm
 
-from ...models import Descriptor, Qualifier, TreeNumber
+from ...models import Descriptor, Qualifier, TreeNumber, Concept, Term
 
 
 class Command(BaseCommand):
@@ -69,6 +69,8 @@ class Command(BaseCommand):
     def import_descriptors(self, path):
         # remove all old descriptors
         Descriptor.objects.all().delete()
+        Concept.objects.all().delete()
+        Term.objects.all().delete()
 
         # parse descriptor xmlfile
         tree = et.parse(path)
@@ -106,6 +108,27 @@ class Command(BaseCommand):
                     qualifiers.append(self.qualifiers[qualifier_ui])
                 if qualifiers:
                     descriptor.qualifiers.set(qualifiers)
+
+            # add concepts and terms
+            concept_list_node = node.find('ConceptList')
+            if concept_list_node:
+                for concept_node in concept_list_node.findall('Concept'):
+                    concept_ui = concept_node.find('ConceptUI').text
+                    concept, created = Concept.objects.get_or_create(
+                        concept_ui=concept_ui,
+                        defaults={'concept_name': concept_node.find('ConceptName').find('String').text}
+                    )
+                    descriptor.concepts.add(concept)
+
+                    term_list_node = concept_node.find('TermList')
+                    if term_list_node:
+                        for term_node in term_list_node.findall('Term'):
+                            term_ui = term_node.find('TermUI').text
+                            term, created = Term.objects.get_or_create(
+                                term_ui=term_ui,
+                                defaults={'string': term_node.find('String').text}
+                            )
+                            concept.terms.add(term)
 
         # loop over descriptors in the database and add parents
         print('Finding parents ...')

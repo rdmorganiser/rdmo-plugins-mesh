@@ -7,6 +7,7 @@ class Descriptor(models.Model):
     descriptor_name = models.CharField(max_length=128)
     parents = models.ManyToManyField('self', symmetrical=False, related_name='children')
     qualifiers = models.ManyToManyField('Qualifier', related_name='descriptors')
+    concepts = models.ManyToManyField('Concept', related_name='descriptors')
     label = models.TextField(max_length=128)
 
 
@@ -14,6 +15,19 @@ class Qualifier(models.Model):
 
     qualifier_ui = models.CharField(max_length=16, primary_key=True)
     qualifier_name = models.CharField(max_length=128)
+
+
+class Concept(models.Model):
+
+    concept_ui = models.CharField(max_length=16, primary_key=True)
+    concept_name = models.CharField(max_length=256)
+    terms = models.ManyToManyField('Term', related_name='concepts')
+
+
+class Term(models.Model):
+
+    term_ui = models.CharField(max_length=16, primary_key=True)
+    string = models.CharField(max_length=256)
 
 
 class TreeNumber(models.Model):
