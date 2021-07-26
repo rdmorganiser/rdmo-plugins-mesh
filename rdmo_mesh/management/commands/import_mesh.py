@@ -5,7 +5,9 @@ from contextlib import closing
 from pathlib import Path
 
 from django.conf import settings
+from django.contrib.postgres.search import SearchVector
 from django.core.management.base import BaseCommand, CommandError
+from django.db.models import Value, TextField
 
 import tqdm
 
@@ -37,6 +39,7 @@ class Command(BaseCommand):
 
         self.import_qualifiers(qualifier_path)
         self.import_descriptors(descriptor_path)
+        self.create_search_vector()
 
     def download_xml(self, url, path):
         # create mesh path
@@ -141,3 +144,16 @@ class Command(BaseCommand):
                     parents.append(parent)
             if parents:
                 descriptor.parents.set(parents)
+
+    def create_search_vector(self):
+        print('Creating search vector ...')
+        for descriptor_ui in tqdm.tqdm(Descriptor.objects.values_list('descriptor_ui', flat=True)):
+            descriptor = Descriptor.objects.get(pk=descriptor_ui)
+
+            descriptor.search_vector = SearchVector(Value(descriptor.descriptor_name, output_field=TextField()))
+
+            for concept in descriptor.concepts.all():
+                for term in concept.terms.all():
+                    descriptor.search_vector += SearchVector(Value(term.string, output_field=TextField()))
+
+            descriptor.save()

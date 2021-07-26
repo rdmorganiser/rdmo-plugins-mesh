@@ -1,5 +1,8 @@
 from django.db import models
 
+from django.contrib.postgres.search import SearchVectorField
+from django.contrib.postgres.indexes import GinIndex
+
 
 class Descriptor(models.Model):
 
@@ -9,6 +12,10 @@ class Descriptor(models.Model):
     qualifiers = models.ManyToManyField('Qualifier', related_name='descriptors')
     concepts = models.ManyToManyField('Concept', related_name='descriptors')
     label = models.TextField(max_length=128)
+    search_vector = SearchVectorField(null=True)
+
+    class Meta:
+        indexes = (GinIndex(fields=['search_vector']),)
 
 
 class Qualifier(models.Model):

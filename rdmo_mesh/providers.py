@@ -1,4 +1,4 @@
-from django.db.models import Q
+from django.contrib.postgres.search import SearchQuery, SearchRank
 
 from rdmo.options.providers import Provider
 
@@ -13,10 +13,14 @@ class DescriptorProvider(Provider):
 
     def get_options(self, project, search):
         if search:
-            print(search)
-            queryset = Descriptor.objects.filter(Q(label__icontains=search) |
-                                                 Q(tree_list__tree_number__icontains=search)) \
-                                         .prefetch_related('qualifiers').distinct()[:10]
+            search_query = SearchQuery(search)
+            search_rank = SearchRank('search_vector', search_query)
+
+            queryset = Descriptor.objects.filter(
+                search_vector=search_query
+            ).annotate(
+                search_rank=search_rank
+            ).order_by('-search_rank').prefetch_related('qualifiers').distinct()[:10]
 
             serializer = DescriptorProviderSerializer(queryset, many=True)
             return serializer.data
