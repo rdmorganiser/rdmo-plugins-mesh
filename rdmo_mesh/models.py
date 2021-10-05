@@ -7,7 +7,7 @@ from django.contrib.postgres.indexes import GinIndex
 class Descriptor(models.Model):
 
     descriptor_ui = models.CharField(max_length=16, primary_key=True)
-    descriptor_name = models.CharField(max_length=128)
+    descriptor_name = models.CharField(max_length=256)
     parents = models.ManyToManyField('self', symmetrical=False, related_name='children')
     qualifiers = models.ManyToManyField('Qualifier', related_name='descriptors')
     concepts = models.ManyToManyField('Concept', related_name='descriptors')

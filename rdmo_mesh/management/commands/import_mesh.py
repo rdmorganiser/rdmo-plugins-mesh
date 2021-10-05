@@ -1,8 +1,4 @@
-import shutil
-import urllib.request as request
 import xml.etree.ElementTree as et
-from contextlib import closing
-from pathlib import Path
 
 from django.conf import settings
 from django.contrib.postgres.search import SearchVector
@@ -18,37 +14,14 @@ class Command(BaseCommand):
 
     def handle(self, *args, **options):
         try:
-            path = Path(settings.MESH_PATH)
-
-            qualifier_url = settings.MESH_QUALIFIER_URL
-            qualifier_path = path / qualifier_url.split('/')[-1]
-
-            descriptor_url = settings.MESH_DESCRIPTOR_URL
-            descriptor_path = path / descriptor_url.split('/')[-1]
-
+            qualifier_path = settings.MESH_QUALIFIER_PATH
+            descriptor_path = settings.MESH_DESCRIPTOR_PATH
         except AttributeError:
-            raise CommandError('MESH_PATH, MESH_QUALIFIER_URL, MESH_DESCRIPTOR_URL are not set.')
-
-        # check if the files are already there
-        if not qualifier_path.exists():
-            print('Downloading {}'.format(qualifier_url))
-            self.download_xml(qualifier_url, qualifier_path)
-        if not descriptor_path.exists():
-            print('Downloading {}'.format(descriptor_url))
-            self.download_xml(descriptor_url, descriptor_path)
+            raise CommandError('MESH_QUALIFIER_PATH, MESH_DESCRIPTOR_PATH are not set.')
 
         self.import_qualifiers(qualifier_path)
         self.import_descriptors(descriptor_path)
         self.create_search_vector()
-
-    def download_xml(self, url, path):
-        # create mesh path
-        path.parent.mkdir(parents=True, exist_ok=True)
-
-        # download the file
-        with closing(request.urlopen(url)) as response:
-            with open(path, 'wb') as fp:
-                shutil.copyfileobj(response, fp)
 
     def import_qualifiers(self, path):
         # remove all old qualifiers
