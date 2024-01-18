@@ -1,7 +1,8 @@
 from django.urls import include, path
+
 from rest_framework import routers
 
-from .viewsets import DescriptorViewSet, QualifierViewSet, ConceptViewSet, TermViewSet
+from .viewsets import ConceptViewSet, DescriptorViewSet, QualifierViewSet, TermViewSet
 
 app_name = 'v1-mesh'
 

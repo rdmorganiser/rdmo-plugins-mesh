@@ -12,7 +12,7 @@ Setup
 Install the plugin in your RDMO virtual environment using pip (directly from GitHub):
 
 ```bash
-pip install git+https://github.com/rdmorganiser/rdmo-mesh
+pip install git+https://github.com/rdmorganiser/rdmo-plugins-mesh
 ```
 
 Add the `rdmo_mesh` app to your `INSTALLED_APPS` in `config/settings/local.py`:

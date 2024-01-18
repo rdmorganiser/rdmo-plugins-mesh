@@ -3,8 +3,7 @@ from django.contrib.postgres.search import SearchQuery, SearchRank
 from rdmo.options.providers import Provider
 
 from .models import Descriptor, Qualifier
-from .serializers import (DescriptorProviderSerializer,
-                          QualifierProviderSerializer)
+from .serializers import DescriptorProviderSerializer, QualifierProviderSerializer
 
 
 class DescriptorProvider(Provider):

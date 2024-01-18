@@ -1,12 +1,12 @@
-from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework.filters import SearchFilter
 from rest_framework.pagination import PageNumberPagination
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.viewsets import ReadOnlyModelViewSet
 
+from django_filters.rest_framework import DjangoFilterBackend
+
 from .models import Concept, Descriptor, Qualifier, Term
-from .serializers import (ConceptSerializer, DescriptorSerializer,
-                          QualifierSerializer, TermSerializer)
+from .serializers import ConceptSerializer, DescriptorSerializer, QualifierSerializer, TermSerializer
 
 
 class Pagination(PageNumberPagination):

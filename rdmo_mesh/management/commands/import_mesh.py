@@ -3,11 +3,11 @@ import xml.etree.ElementTree as et
 from django.conf import settings
 from django.contrib.postgres.search import SearchVector
 from django.core.management.base import BaseCommand, CommandError
-from django.db.models import Value, TextField
+from django.db.models import TextField, Value
 
 import tqdm
 
-from ...models import Descriptor, Qualifier, TreeNumber, Concept, Term
+from ...models import Concept, Descriptor, Qualifier, Term, TreeNumber
 
 
 class Command(BaseCommand):
@@ -16,8 +16,8 @@ class Command(BaseCommand):
         try:
             qualifier_path = settings.MESH_QUALIFIER_PATH
             descriptor_path = settings.MESH_DESCRIPTOR_PATH
-        except AttributeError:
-            raise CommandError('MESH_QUALIFIER_PATH, MESH_DESCRIPTOR_PATH are not set.')
+        except AttributeError as e:
+            raise CommandError('MESH_QUALIFIER_PATH, MESH_DESCRIPTOR_PATH are not set.') from e
 
         self.import_qualifiers(qualifier_path)
         self.import_descriptors(descriptor_path)
